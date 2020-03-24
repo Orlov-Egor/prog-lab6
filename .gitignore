@@ -1,0 +1,13 @@
+# VS Code
+.vscode
+.classpath
+.project
+.settings
+.factorypath
+bin
+
+# IntelliJ IDEA
+.idea
+
+# Gradle
+.gradle
