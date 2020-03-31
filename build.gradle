@@ -1,27 +1,38 @@
 plugins {
-  id 'java'
-  id 'application'
   id 'com.github.johnrengelman.shadow' version '5.2.0'
 }
 
-application {
-  mainClassName = 'client.Client'
-}
-
-repositories {
+subprojects {
+  apply plugin: 'java'
+  apply plugin: 'com.github.johnrengelman.shadow'
+  repositories {
     mavenCentral()
+  }
 }
 
-dependencies {
-  implementation 'com.google.code.gson:gson:2.8.6'
+project(':server') {
+  apply plugin: 'application'
+  mainClassName = 'server.App'
+  dependencies {
+    implementation project(':common')
+    implementation 'com.google.code.gson:gson:2.8.6'
+  }
+  jar {
+    manifest {
+        attributes 'Main-Class': 'server.App'
+    }
+  }
 }
 
-run {
-  standardInput = System.in
-}
-
-jar {
-  manifest {
-      attributes 'Main-Class': 'client.Client'
+project(':client') {
+  apply plugin: 'application'
+  mainClassName = 'client.App'
+  dependencies {
+    implementation project(':common')
+  }
+  jar {
+    manifest {
+        attributes 'Main-Class': 'client.App'
+    }
   }
 }
