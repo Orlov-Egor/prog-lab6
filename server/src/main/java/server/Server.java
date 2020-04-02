@@ -20,9 +20,13 @@ public class Server implements Runnable {
         this.soTimeout = soTimeout;
     }
 
-    public int getPort() {
-        return port;
-    }
+//    public int getPort() {
+//        return port;
+//    }
+//
+//    public int getTimeout() {
+//        return soTimeout;
+//    }
 
     @Override
     public void run() {
