@@ -3,6 +3,8 @@ package server;
 import common.exceptions.ClosingSocketException;
 import common.exceptions.ConnectionErrorException;
 import common.exceptions.OpeningServerSocketException;
+import common.interaction.Request;
+import common.interaction.Response;
 import common.utility.Outputer;
 
 import java.io.IOException;
@@ -89,14 +91,19 @@ public class Server {
     private void processClientRequest(Socket clientSocket) {
         try (ObjectInputStream clientReader = new ObjectInputStream(clientSocket.getInputStream());
              ObjectOutputStream clientWriter = new ObjectOutputStream(clientSocket.getOutputStream())) {
-            String userRequest;
-            String responseToUser;
+            Request userRequest;
+            Response responseToUser;
             while (true) {
-                userRequest = (String) clientReader.readObject();
-                responseToUser = "~" + userRequest + "~";
+                // Получение запроса
+                userRequest = (Request) clientReader.readObject();
+                // Обработка запроса
                 Outputer.println("---------------");
-                Outputer.println("Полученные данные: " + userRequest);  // Обработка запроса
-                clientWriter.writeObject(responseToUser);  // Отправка ответа
+                Outputer.println("Полученные данные: " + userRequest);
+                // Генерация ответа
+                responseToUser = new Response(0, "Command " + userRequest.getCommandName() + "(" + userRequest.getCommandStringArgument() +
+                        ", " + userRequest.getCommandObjectArgument() + ") executed.");
+                // Отправка ответа
+                clientWriter.writeObject(responseToUser);
                 clientWriter.flush();
                 Outputer.println("Отправленные данные: " + responseToUser);
                 Outputer.println("---------------");

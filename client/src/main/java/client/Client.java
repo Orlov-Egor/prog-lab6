@@ -1,6 +1,8 @@
 package client;
 
 import common.exceptions.ConnectionErrorException;
+import common.interaction.Request;
+import common.interaction.Response;
 import common.utility.Outputer;
 
 import java.io.IOException;
@@ -10,6 +12,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
+
+// TODO: После того, как всё доделаю, разобрать с Object методами во всем проекте
 
 public class Client {
     private final int RECONNECTION_TIMEOUT = 5*1000;
@@ -71,22 +75,26 @@ public class Client {
     private void processRequestToServer(SocketChannel socketChannel) {
         try (ObjectOutputStream serverWriter = new ObjectOutputStream(socketChannel.socket().getOutputStream());
              ObjectInputStream serverReader = new ObjectInputStream(socketChannel.socket().getInputStream())) {
-            String requestToServer;
-            String serverResponse;
+            Request requestToServer;
+            Response serverResponse;
             int requestNum = 1;
             while (true) {
-                requestToServer = "Request " + requestNum;
+                // Генерация запроса
+                requestToServer = new Request("testCommand"+requestNum, "testArgument"+requestNum, "testObject"+requestNum);
+                // Отправка запроса
                 serverWriter.writeObject(requestToServer);
                 Outputer.println("---------------");
-                Outputer.println("Отправленные данные: " + requestToServer);  // Отправка запроса
-                serverResponse = (String) serverReader.readObject();  // Получение ответа
+                Outputer.println("Отправленные данные: " + requestToServer);
+                // Получение ответа
+                serverResponse = (Response) serverReader.readObject();
+                // Обработка ответа
                 Outputer.println("Полученные данные: " + serverResponse);
                 Outputer.println("---------------");
                 requestNum++;
                 try {
                     Thread.sleep(5 * 1000);
                 } catch (Exception exception) {
-                    Outputer.printerror("Произошла ошибка при попытке задержки перед следующим запросом!");
+                    Outputer.printerror("Произошла ошибка при задержке перед следующим запросом!");
                 }
             }
         } catch (InvalidClassException | NotSerializableException exception) {
