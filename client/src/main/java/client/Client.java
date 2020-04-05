@@ -13,20 +13,22 @@ import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
 
-// TODO: После того, как всё доделаю, разобрать с Object методами во всем проекте
+// TODO: После того, как всё доделаю, разобраться с Object методами во всем проекте
 
 public class Client {
-    private final int RECONNECTION_TIMEOUT = 5*1000;
-    private final int MAX_RECONNECTION_ATTEMPTS = 5;
+    private final int reconnectionTimeout;
+    private final int maxReconnectionAttempts;
     //private final int BUFFER_SIZE = 64;
 
     private String host;
     private int port;
-    private int reconnectionAttempts;
+    private int reconnectionAttempts = 0;
 
-    public Client(String host, int port) {
+    public Client(String host, int port, int reconnectionTimeout, int maxReconnectionAttempts) {
         this.host = host;
         this.port = port;
+        this.reconnectionTimeout = reconnectionTimeout;
+        this.maxReconnectionAttempts = maxReconnectionAttempts;
     }
 
     public void run() {
@@ -36,17 +38,20 @@ public class Client {
             try (SocketChannel socketChannel = connectToServer()) {
                 processRequestToServer(socketChannel);
             } catch (ConnectionErrorException exception) {
-                if (reconnectionAttempts >= MAX_RECONNECTION_ATTEMPTS) break;
+                reconnectionAttempts += 1;
+                if (reconnectionAttempts >= maxReconnectionAttempts) {
+                    Outputer.printerror("Превышено количество попыток подключения!");
+                    break;
+                }
                 try {
-                    Thread.sleep(RECONNECTION_TIMEOUT);
+                    Thread.sleep(reconnectionTimeout);
                 } catch (IllegalArgumentException timeoutException) {
-                    Outputer.printerror("Время ожидания " + RECONNECTION_TIMEOUT +
+                    Outputer.printerror("Время ожидания " + reconnectionTimeout +
                             " находится за пределами возможных значений!");
                 } catch (Exception timeoutException) {
                     Outputer.printerror("Произошла ошибка при попытке ожидания подключения!\n" +
                             "Повторное подключение будет проведено немедленно.");
                 }
-                reconnectionAttempts += 1;
             } catch (IOException exception) {
                 Outputer.printerror("Произошла ошибка при попытке завершить соединение с сервером!");
             }

@@ -17,8 +17,9 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 
 public class Server {
+    private final int soTimeout;
+
     private int port;
-    private int soTimeout;
     private ServerSocket serverSocket;
 
     public Server(int port, int soTimeout) {
