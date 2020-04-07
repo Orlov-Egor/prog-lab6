@@ -5,6 +5,7 @@ import common.exceptions.ConnectionErrorException;
 import common.exceptions.OpeningServerSocketException;
 import common.interaction.Request;
 import common.interaction.Response;
+import common.interaction.ResponseCode;
 import common.utility.Outputer;
 
 import java.io.IOException;
@@ -101,8 +102,8 @@ public class Server {
                 Outputer.println("---------------");
                 Outputer.println("Полученные данные: " + userRequest);
                 // Генерация ответа
-                responseToUser = new Response(0, "Command " + userRequest.getCommandName() + "(" + userRequest.getCommandStringArgument() +
-                        ", " + userRequest.getCommandObjectArgument() + ") executed.");
+                responseToUser = new Response(ResponseCode.OK, "Command " + userRequest.getCommandName() + "(" +
+                        userRequest.getCommandStringArgument() + ", " + userRequest.getCommandObjectArgument() + ") executed.");
                 // Отправка ответа
                 clientWriter.writeObject(responseToUser);
                 clientWriter.flush();
