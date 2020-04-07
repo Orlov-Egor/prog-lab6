@@ -10,6 +10,13 @@ public class Outputer {
     }
 
     /**
+     * Prints \n to Console
+     */
+    public static void println() {
+        System.out.println();
+    }
+
+    /**
      * Prints toOut.toString() + \n to Console
      * @param toOut Object to print
      */

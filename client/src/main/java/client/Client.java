@@ -1,5 +1,6 @@
 package client;
 
+import client.utility.UserHandler;
 import common.exceptions.ConnectionErrorException;
 import common.interaction.Request;
 import common.interaction.Response;
@@ -38,7 +39,7 @@ public class Client {
             try (SocketChannel socketChannel = connectToServer()) {
                 processRequestToServer(socketChannel);
             } catch (ConnectionErrorException exception) {
-                reconnectionAttempts += 1;
+                reconnectionAttempts++;
                 if (reconnectionAttempts >= maxReconnectionAttempts) {
                     Outputer.printerror("Превышено количество попыток подключения!");
                     break;
@@ -82,10 +83,10 @@ public class Client {
              ObjectInputStream serverReader = new ObjectInputStream(socketChannel.socket().getInputStream())) {
             Request requestToServer;
             Response serverResponse;
-            int requestNum = 1;
+            UserHandler userHandler = new UserHandler();
             while (true) {
                 // Генерация запроса
-                requestToServer = new Request("testCommand"+requestNum, "testArgument"+requestNum, "testObject"+requestNum);
+                requestToServer = userHandler.handle();
                 // Отправка запроса
                 serverWriter.writeObject(requestToServer);
                 Outputer.println("---------------");
@@ -95,12 +96,6 @@ public class Client {
                 // Обработка ответа
                 Outputer.println("Полученные данные: " + serverResponse);
                 Outputer.println("---------------");
-                requestNum++;
-                try {
-                    Thread.sleep(5 * 1000);
-                } catch (Exception exception) {
-                    Outputer.printerror("Произошла ошибка при задержке перед следующим запросом!");
-                }
             }
         } catch (InvalidClassException | NotSerializableException exception) {
             Outputer.printerror("Произошла ошибка при отправке данных на сервер!");

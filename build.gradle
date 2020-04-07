@@ -30,6 +30,9 @@ project(':client') {
   dependencies {
     implementation project(':common')
   }
+  run {
+    standardInput = System.in
+  }
   jar {
     manifest {
         attributes 'Main-Class': 'client.App'

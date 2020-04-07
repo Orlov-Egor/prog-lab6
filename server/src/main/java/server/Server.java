@@ -7,6 +7,7 @@ import common.interaction.Request;
 import common.interaction.Response;
 import common.interaction.ResponseCode;
 import common.utility.Outputer;
+import server.utility.RequestHandler;
 
 import java.io.IOException;
 import java.io.InvalidClassException;
@@ -95,27 +96,21 @@ public class Server {
              ObjectOutputStream clientWriter = new ObjectOutputStream(clientSocket.getOutputStream())) {
             Request userRequest;
             Response responseToUser;
+            RequestHandler requestHandler;
             while (true) {
-                // Получение запроса
                 userRequest = (Request) clientReader.readObject();
-                // Обработка запроса
-                Outputer.println("---------------");
-                Outputer.println("Полученные данные: " + userRequest);
-                // Генерация ответа
-                responseToUser = new Response(ResponseCode.OK, "Command " + userRequest.getCommandName() + "(" +
-                        userRequest.getCommandStringArgument() + ", " + userRequest.getCommandObjectArgument() + ") executed.");
-                // Отправка ответа
+                requestHandler = new RequestHandler(userRequest);
+                responseToUser = requestHandler.handle();
                 clientWriter.writeObject(responseToUser);
                 clientWriter.flush();
-                Outputer.println("Отправленные данные: " + responseToUser);
-                Outputer.println("---------------");
+                Outputer.println("Запрос успешно обработан.");
             }
         } catch (ClassNotFoundException exception) {
             Outputer.printerror("Произошла ошибка при чтении полученных данных!");
         } catch (InvalidClassException | NotSerializableException exception) {
             Outputer.printerror("Произошла ошибка при отправке данных на клиент!");
         } catch (IOException exception) {
-            Outputer.printerror("Непредвиденный разрыв соединения с клиентом! (" + exception + ")");
+            Outputer.printerror("Непредвиденный разрыв соединения с клиентом!");
         }
     }
 }
