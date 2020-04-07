@@ -11,6 +11,14 @@ public class Response implements Serializable {
         this.responseBody = responseBody;
     }
 
+    public ResponseCode getResponseCode() {
+        return responseCode;
+    }
+
+    public String getResponseBody() {
+        return responseBody;
+    }
+
     @Override
     public String toString() {
         return "Response[" + responseCode + ", " + responseBody + "]";
