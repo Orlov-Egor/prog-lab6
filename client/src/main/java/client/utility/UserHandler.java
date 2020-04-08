@@ -1,14 +1,12 @@
 package client.utility;
 
 import client.App;
-import common.data.SpaceMarine;
 import common.exceptions.CommandUsageException;
 import common.exceptions.IncorrectInputInScriptException;
 import common.interaction.MarineRaw;
 import common.interaction.Request;
 import common.utility.Outputer;
 
-import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
