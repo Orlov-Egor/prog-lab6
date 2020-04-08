@@ -1,27 +1,40 @@
 package client.utility;
 
 import client.App;
-import common.exceptions.InputerException;
+import common.data.SpaceMarine;
+import common.exceptions.CommandUsageException;
+import common.exceptions.IncorrectInputInScriptException;
+import common.interaction.MarineRaw;
 import common.interaction.Request;
-import common.utility.Inputer;
 import common.utility.Outputer;
 
-// TODO: Полученияе объекта для команд типа add
+import java.time.LocalDateTime;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
+
 // TODO: Получение скрипта
 
 public class UserHandler {
     private final int maxRewriteAttempts = 1;
 
-    private int rewriteAttempts = 0;
+    private Scanner userScanner;
+    private MarineAsker marineAsker;
+
+    public UserHandler(Scanner userScanner, MarineAsker marineAsker) {
+        this.userScanner = userScanner;
+        this.marineAsker = marineAsker;
+    }
 
     public Request handle() {
         String[] userCommand;
+        ProcessingCode processingCode;
+        int rewriteAttempts = 0;
         do {
             try {
                 Outputer.print(App.PS1);
-                userCommand = (Inputer.nextLine().trim() + " ").split(" ", 2);
+                userCommand = (userScanner.nextLine().trim() + " ").split(" ", 2);
                 userCommand[1] = userCommand[1].trim();
-            } catch (InputerException exception) {
+            } catch (NoSuchElementException | IllegalStateException exception) {
                 Outputer.println();
                 Outputer.printerror("Произошла ошибка при пользовательском вводе!");
                 userCommand = new String[] {"", ""};
@@ -31,12 +44,92 @@ public class UserHandler {
                     System.exit(0);
                 }
             }
-        } while (!validateCommand(userCommand[0], userCommand[1]));
+            processingCode = processCommand(userCommand[0], userCommand[1]);
+        } while (processingCode == ProcessingCode.ERROR);
+        try {
+            switch (processingCode) {
+                case OBJECT:
+                    MarineRaw marineRaw = new MarineRaw(
+                            marineAsker.askName(),
+                            marineAsker.askCoordinates(),
+                            marineAsker.askHealth(),
+                            marineAsker.askCategory(),
+                            marineAsker.askWeaponType(),
+                            marineAsker.askMeleeWeapon(),
+                            marineAsker.askChapter()
+                    );
+                    return new Request(userCommand[0], userCommand[1], marineRaw);
+                case SCRIPT:
+                    Outputer.printerror("Как же я устал, зачем все вот это, сколько можно....");
+                    break;
+            }
+            // TODO: Для чего-то все-таки был нужен этот эксепшн...
+        }  catch (IncorrectInputInScriptException exception) {}
         return new Request(userCommand[0], userCommand[1]);
     }
 
-    private boolean validateCommand(String command, String commandArgument) {
-        // TODO: Валидация команды
-        return !command.isEmpty();
+    private ProcessingCode processCommand(String command, String commandArgument) {
+        try {
+            switch (command) {
+                case "":
+                    return ProcessingCode.ERROR;
+                case "help":
+                    if (!commandArgument.isEmpty()) throw new CommandUsageException();
+                    break;
+                case "info":
+                    if (!commandArgument.isEmpty()) throw new CommandUsageException();
+                    break;
+                case "show":
+                    if (!commandArgument.isEmpty()) throw new CommandUsageException();
+                    break;
+                case "add":
+                    if (!commandArgument.isEmpty()) throw new CommandUsageException("{element}");
+                    return ProcessingCode.OBJECT;
+                case "update":
+                    if (commandArgument.isEmpty()) throw new CommandUsageException("<ID> {element}");
+                    return ProcessingCode.OBJECT;
+                case "remove_by_id":
+                    if (commandArgument.isEmpty()) throw new CommandUsageException("<ID>");
+                    break;
+                case "clear":
+                    if (!commandArgument.isEmpty()) throw new CommandUsageException();
+                    break;
+                case "save":
+                    if (!commandArgument.isEmpty()) throw new CommandUsageException();
+                    break;
+                case "execute_script":
+                    if (commandArgument.isEmpty()) throw new CommandUsageException("<file_name>");
+                    break;
+                case "exit":
+                    if (!commandArgument.isEmpty()) throw new CommandUsageException();
+                    break;
+                case "add_if_min":
+                    if (!commandArgument.isEmpty()) throw new CommandUsageException("{element}");
+                    return ProcessingCode.OBJECT;
+                case "remove_greater":
+                    if (!commandArgument.isEmpty()) throw new CommandUsageException("{element}");
+                    return ProcessingCode.OBJECT;
+                case "history":
+                    if (!commandArgument.isEmpty()) throw new CommandUsageException();
+                    break;
+                case "sum_of_health":
+                    if (!commandArgument.isEmpty()) throw new CommandUsageException();
+                    break;
+                case "max_by_melee_weapon":
+                    if (!commandArgument.isEmpty()) throw new CommandUsageException();
+                    break;
+                case "filter_by_weapon_type":
+                    if (commandArgument.isEmpty()) throw new CommandUsageException("<weapon_type>");
+                    break;
+                default:
+                    Outputer.println("Команда '" + command + "' не найдена. Наберите 'help' для справки.");
+                    return ProcessingCode.ERROR;
+            }
+        } catch (CommandUsageException exception) {
+            if (exception.getMessage() != null) command += " " + exception.getMessage();
+            Outputer.println("Использование: '" + command + "'");
+            return ProcessingCode.ERROR;
+        }
+        return ProcessingCode.OK;
     }
 }

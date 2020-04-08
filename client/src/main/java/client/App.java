@@ -1,6 +1,9 @@
 package client;
 
-import common.utility.Inputer;
+import client.utility.MarineAsker;
+import client.utility.UserHandler;
+
+import java.util.Scanner;
 
 public class App {
     public static final String HOST = "localhost";
@@ -11,9 +14,11 @@ public class App {
     public static final String PS2 = "> ";
 
     public static void main(String[] args) {
-        Client client = new Client(HOST, PORT, RECONNECTION_TIMEOUT, MAX_RECONNECTION_ATTEMPTS);
-        Inputer.open();
-        client.run();
-        Inputer.close();
+        try (Scanner userScanner = new Scanner(System.in)) {
+            MarineAsker marineAsker = new MarineAsker(userScanner);
+            UserHandler userHandler = new UserHandler(userScanner, marineAsker);
+            Client client = new Client(HOST, PORT, RECONNECTION_TIMEOUT, MAX_RECONNECTION_ATTEMPTS, userHandler);
+            client.run();
+        } catch (Exception exception) {}
     }
 }

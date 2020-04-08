@@ -1,9 +1,11 @@
 package common.data;
 
+import java.io.Serializable;
+
 /**
  * Chapter with marines.
  */
-public class Chapter {
+public class Chapter implements Serializable {
     private String name;
     private long marinesCount;
 

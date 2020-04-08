@@ -6,11 +6,7 @@ import common.interaction.Request;
 import common.interaction.Response;
 import common.utility.Outputer;
 
-import java.io.IOException;
-import java.io.InvalidClassException;
-import java.io.NotSerializableException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
 
@@ -24,12 +20,14 @@ public class Client {
     private String host;
     private int port;
     private int reconnectionAttempts = 0;
+    private UserHandler userHandler;
 
-    public Client(String host, int port, int reconnectionTimeout, int maxReconnectionAttempts) {
+    public Client(String host, int port, int reconnectionTimeout, int maxReconnectionAttempts, UserHandler userHandler) {
         this.host = host;
         this.port = port;
         this.reconnectionTimeout = reconnectionTimeout;
         this.maxReconnectionAttempts = maxReconnectionAttempts;
+        this.userHandler = userHandler;
     }
 
     public void run() {
@@ -83,7 +81,6 @@ public class Client {
              ObjectInputStream serverReader = new ObjectInputStream(socketChannel.socket().getInputStream())) {
             Request requestToServer;
             Response serverResponse;
-            UserHandler userHandler = new UserHandler();
             while (true) {
                 // Генерация запроса
                 requestToServer = userHandler.handle();

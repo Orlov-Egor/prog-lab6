@@ -6,6 +6,11 @@ import java.time.LocalDateTime;
  * Main character. Is stored in the collection.
  */
 public class SpaceMarine implements Comparable<SpaceMarine> {
+    public static final int MAX_Y = 262;
+    public static final double MIN_HEALTH = 0;
+    public static final long MIN_MARINES = 1;
+    public static final long MAX_MARINES = 1000;
+
     private Long id;
     private String name;
     private Coordinates coordinates;
