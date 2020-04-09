@@ -13,3 +13,5 @@ bin
 # Gradle
 .gradle
 
+# Project
+*.log

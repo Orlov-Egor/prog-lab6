@@ -108,12 +108,16 @@ public class Server {
             RequestHandler requestHandler;
             while (true) {
                 userRequest = (Request) clientReader.readObject();
+                Outputer.println("Получен новый запрос.");
+                App.logger.info("Получен новый запрос.");
                 requestHandler = new RequestHandler(userRequest);
                 responseToUser = requestHandler.handle();
-                clientWriter.writeObject(responseToUser);
-                clientWriter.flush();
                 Outputer.println("Запрос успешно обработан.");
                 App.logger.info("Запрос успешно обработан.");
+                clientWriter.writeObject(responseToUser);
+                clientWriter.flush();
+                Outputer.println("Отправлен ответ клиенту.");
+                App.logger.info("Отправлен ответ клиенту.");
             }
         } catch (ClassNotFoundException exception) {
             Outputer.printerror("Произошла ошибка при чтении полученных данных!");
