@@ -18,10 +18,12 @@ public class Server {
 
     private int port;
     private ServerSocket serverSocket;
+    private RequestHandler requestHandler;
 
-    public Server(int port, int soTimeout) {
+    public Server(int port, int soTimeout, RequestHandler requestHandler) {
         this.port = port;
         this.soTimeout = soTimeout;
+        this.requestHandler = requestHandler;
     }
 
     public void run() {
@@ -51,7 +53,7 @@ public class Server {
         try {
             if (serverSocket == null) throw new ClosingSocketException();
             serverSocket.close();
-            Outputer.println("Работа сервера успешно завершена.");
+            Outputer.println("Работа сервер успешно завершена.");
             App.logger.info("Работа сервера успешно завершена.");
         } catch (ClosingSocketException exception) {
             Outputer.printerror("Невозможно завершить работу еще не запущенного сервера!");
@@ -64,12 +66,12 @@ public class Server {
 
     private void openServerSocket() throws OpeningServerSocketException {
         try {
-            Outputer.println("Запуск сервера...");
-            App.logger.info("Запуск сервера...");
+            Outputer.println("Запуск серверной части...");
+            App.logger.info("Запуск серверной части...");
             serverSocket = new ServerSocket(port);
             serverSocket.setSoTimeout(soTimeout);
-            Outputer.println("Сервер успешно запущен.");
-            App.logger.info("Сервер успешно запущен.");
+            Outputer.println("Серверная часть успешно запущен.");
+            App.logger.info("Серверная часть успешно запущен.");
         } catch (IllegalArgumentException exception) {
             Outputer.printerror("Порт " + port + " находится за пределами возможных значений!");
             App.logger.fatal("Порт " + port + " находится за пределами возможных значений!");
@@ -105,13 +107,11 @@ public class Server {
              ObjectOutputStream clientWriter = new ObjectOutputStream(clientSocket.getOutputStream())) {
             Request userRequest;
             Response responseToUser;
-            RequestHandler requestHandler;
             while (true) {
                 userRequest = (Request) clientReader.readObject();
                 Outputer.println("Получен новый запрос.");
                 App.logger.info("Получен новый запрос.");
-                requestHandler = new RequestHandler(userRequest);
-                responseToUser = requestHandler.handle();
+                responseToUser = requestHandler.handle(userRequest);
                 Outputer.println("Запрос успешно обработан.");
                 App.logger.info("Запрос успешно обработан.");
                 clientWriter.writeObject(responseToUser);

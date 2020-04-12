@@ -10,7 +10,7 @@ import common.utility.Outputer;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
-// TODO: Получение скрипта
+// TODO: Выполнение скрипта
 
 public class UserHandler {
     private final int maxRewriteAttempts = 1;
@@ -97,7 +97,7 @@ public class UserHandler {
                     break;
                 case "execute_script":
                     if (commandArgument.isEmpty()) throw new CommandUsageException("<file_name>");
-                    break;
+                    return ProcessingCode.SCRIPT;
                 case "exit":
                     if (!commandArgument.isEmpty()) throw new CommandUsageException();
                     break;

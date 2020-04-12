@@ -1,14 +1,13 @@
 package server.utility;
 
+import common.data.MeleeWeapon;
+import common.data.SpaceMarine;
+import common.data.Weapon;
+import common.exceptions.CollectionIsEmptyException;
+
 import java.time.LocalDateTime;
 import java.util.NavigableSet;
 import java.util.TreeSet;
-import java.util.Comparator; 
-
-import data.SpaceMarine;
-import data.Weapon;
-import exceptions.CollectionIsEmptyException;
-import data.MeleeWeapon;
 
 /**
  * Operates the collection itself.
@@ -17,12 +16,12 @@ public class CollectionManager {
     private NavigableSet<SpaceMarine> marinesCollection =  new TreeSet<>();
     private LocalDateTime lastInitTime;
     private LocalDateTime lastSaveTime;
-    private FileManager fileManager;
+    private CollectionFileManager collectionFileManager;
 
-    public CollectionManager(FileManager fileManager) {
+    public CollectionManager(CollectionFileManager collectionFileManager) {
         this.lastInitTime = null;
         this.lastSaveTime = null;
-        this.fileManager = fileManager;
+        this.collectionFileManager = collectionFileManager;
         
         loadCollection();
     }
@@ -73,10 +72,6 @@ public class CollectionManager {
      * @param id ID of the marine.
      * @return A marine by his ID or null if marine isn't found.
      */
-    // public SpaceMarine getById(Long id) {
-    //     return marinesCollection.stream().filter(marine -> marine.getId()==id);
-    // }
-
     public SpaceMarine getById(Long id) {
         return marinesCollection.stream().filter(marine -> marine.getId().equals(id)).findFirst().orElse(null);
     }
@@ -93,10 +88,8 @@ public class CollectionManager {
      * @return Sum of all marines' health or 0 if collection is empty.
      */
     public double getSumOfHealth() {
-
-        double sumOfHealth = marinesCollection.stream()
-        .reduce(0.0, (sum,p) -> sum+=p.getHealth(), (sum1,sum2) -> sum1+sum2);
-        return sumOfHealth;
+        return marinesCollection.stream()
+                .reduce(0.0, (sum,p) -> sum+=p.getHealth(), Double::sum);
     }
 
     /**
@@ -105,10 +98,11 @@ public class CollectionManager {
      */
     public String maxByMeleeWeapon() throws CollectionIsEmptyException {
         if (marinesCollection.isEmpty()) throw new CollectionIsEmptyException();
-        MeleeWeapon maxMelleWeapon = marinesCollection.stream().map(marine -> marine.getMeleeWeapon())
-            .max(Comparator.comparing(String::valueOf)).get();
+
+        MeleeWeapon maxMeleeWeapon = marinesCollection.stream().map(marine -> marine.getMeleeWeapon())
+            .max(Enum::compareTo).get();
         return marinesCollection.stream()
-            .filter(marine -> marine.getMeleeWeapon().equals(maxMelleWeapon)).findFirst().toString();
+            .filter(marine -> marine.getMeleeWeapon().equals(maxMeleeWeapon)).findFirst().toString();
     }
 
     /**
@@ -116,9 +110,8 @@ public class CollectionManager {
      * @return Information about valid marines or empty string, if there's no such marines.
      */
     public String weaponFilteredInfo(Weapon weaponToFilter) {
-        String info = marinesCollection.stream().filter(marine -> marine.getWeaponType().equals(weaponToFilter))
-        .reduce("", (sum,m) -> sum+= m +"\n\n", (sum1,sum2) -> sum1+sum2);
-        return info;
+        return marinesCollection.stream().filter(marine -> marine.getWeaponType().equals(weaponToFilter))
+                .reduce("", (sum,m) -> sum+= m +"\n\n", (sum1,sum2) -> sum1+sum2).trim();
     }
 
     /**
@@ -165,7 +158,7 @@ public class CollectionManager {
      * Saves the collection to file.
      */
     public void saveCollection() {
-            fileManager.writeCollection(marinesCollection);
+            collectionFileManager.writeCollection(marinesCollection);
             lastSaveTime = LocalDateTime.now();
     }
 
@@ -173,19 +166,13 @@ public class CollectionManager {
      * Loads the collection from file.
      */
     private void loadCollection() {
-        marinesCollection = fileManager.readCollection();
+        marinesCollection = collectionFileManager.readCollection();
         lastInitTime = LocalDateTime.now();
     }
 
     @Override
     public String toString() {
         if (marinesCollection.isEmpty()) return "Коллекция пуста!";
-
-        String info = "";
-        for (SpaceMarine marine : marinesCollection) {
-            info += marine;
-            if (marine != marinesCollection.last()) info += "\n\n";
-        }
-        return info;
+        return marinesCollection.stream().reduce("", (sum,m) -> sum+= m +"\n\n", (sum1,sum2) ->  sum1+sum2).trim();
     }
 }
