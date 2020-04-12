@@ -1,14 +1,14 @@
-package utility;
+package server.utility;
 
 import java.time.LocalDateTime;
 import java.util.NavigableSet;
 import java.util.TreeSet;
-
-import java.util.stream.Collectors;
+import java.util.Comparator; 
 
 import data.SpaceMarine;
 import data.Weapon;
 import exceptions.CollectionIsEmptyException;
+import data.MeleeWeapon;
 
 /**
  * Operates the collection itself.
@@ -66,24 +66,19 @@ public class CollectionManager {
      * @return The first element of the collection or null if collection is empty.
      */
     public SpaceMarine getFirst() {
-        if (marinesCollection.isEmpty()) return null;
-        return marinesCollection.first();
-    }
-
-    /**
-     * @return The last element of the collection or null if collection is empty.
-     */
-    public SpaceMarine getLast() {
-        if (marinesCollection.isEmpty()) return null;
-        return marinesCollection.last();
+        return marinesCollection.stream().findFirst().orElse(null);
     }
 
     /**
      * @param id ID of the marine.
      * @return A marine by his ID or null if marine isn't found.
      */
+    // public SpaceMarine getById(Long id) {
+    //     return marinesCollection.stream().filter(marine -> marine.getId()==id);
+    // }
+
     public SpaceMarine getById(Long id) {
-        return (SpaceMarine) marinesCollection.stream().filter(marine -> marine.getId()==id);
+        return marinesCollection.stream().filter(marine -> marine.getId().equals(id)).findFirst().orElse(null);
     }
 
     /**
@@ -91,7 +86,7 @@ public class CollectionManager {
      * @return A marine by his value or null if marine isn't found.
      */
     public SpaceMarine getByValue(SpaceMarine marineToFind) {
-        return (SpaceMarine) marinesCollection.stream().filter(marine -> marine.equals(marineToFind));
+        return marinesCollection.stream().filter(marine -> marine.equals(marineToFind)).findFirst().orElse(null);
     }
 
     /**
@@ -110,13 +105,10 @@ public class CollectionManager {
      */
     public String maxByMeleeWeapon() throws CollectionIsEmptyException {
         if (marinesCollection.isEmpty()) throw new CollectionIsEmptyException();
-        SpaceMarine maxMarine = getFirst();
-        for (SpaceMarine marine : marinesCollection) {
-            if (marine.getMeleeWeapon().compareTo(maxMarine.getMeleeWeapon()) > 0) {
-                maxMarine = marine;
-            }
-        }
-        return maxMarine.toString();
+        MeleeWeapon maxMelleWeapon = marinesCollection.stream().map(marine -> marine.getMeleeWeapon())
+            .max(Comparator.comparing(String::valueOf)).get();
+        return marinesCollection.stream()
+            .filter(marine -> marine.getMeleeWeapon().equals(maxMelleWeapon)).findFirst().toString();
     }
 
     /**
@@ -125,7 +117,7 @@ public class CollectionManager {
      */
     public String weaponFilteredInfo(Weapon weaponToFilter) {
         String info = marinesCollection.stream().filter(marine -> marine.getWeaponType().equals(weaponToFilter))
-        .reduce("", (sum,m) -> sum+=m.getWeaponType()+"\n\n", (sum1,sum2) -> sum1+sum2);
+        .reduce("", (sum,m) -> sum+= m +"\n\n", (sum1,sum2) -> sum1+sum2);
         return info;
     }
 
