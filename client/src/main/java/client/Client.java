@@ -4,6 +4,7 @@ import client.utility.UserHandler;
 import common.exceptions.ConnectionErrorException;
 import common.interaction.Request;
 import common.interaction.Response;
+import common.interaction.ResponseCode;
 import common.utility.Outputer;
 
 import java.io.*;
@@ -82,17 +83,18 @@ public class Client {
             Request requestToServer;
             Response serverResponse;
             while (true) {
-                // Генерация запроса
                 requestToServer = userHandler.handle();
-                // Отправка запроса
                 serverWriter.writeObject(requestToServer);
-                Outputer.println("---------------");
-                Outputer.println("Отправленные данные: " + requestToServer);
-                // Получение ответа
                 serverResponse = (Response) serverReader.readObject();
-                // Обработка ответа
-                Outputer.println("Полученные данные: " + serverResponse);
-                Outputer.println("---------------");
+                switch (serverResponse.getResponseCode()) {
+                    // TODO: Подумать и подделать
+                    case OK:
+                    case ERROR:
+                        Outputer.println(serverResponse.getResponseBody());
+                        break;
+                    case EXIT:
+                        System.exit(0);
+                }
             }
         } catch (InvalidClassException | NotSerializableException exception) {
             Outputer.printerror("Произошла ошибка при отправке данных на сервер!");

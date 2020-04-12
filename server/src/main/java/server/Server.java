@@ -53,7 +53,7 @@ public class Server {
         try {
             if (serverSocket == null) throw new ClosingSocketException();
             serverSocket.close();
-            Outputer.println("Работа сервер успешно завершена.");
+            Outputer.println("Работа сервера успешно завершена.");
             App.logger.info("Работа сервера успешно завершена.");
         } catch (ClosingSocketException exception) {
             Outputer.printerror("Невозможно завершить работу еще не запущенного сервера!");
@@ -109,15 +109,11 @@ public class Server {
             Response responseToUser;
             while (true) {
                 userRequest = (Request) clientReader.readObject();
-                Outputer.println("Получен новый запрос.");
-                App.logger.info("Получен новый запрос.");
                 responseToUser = requestHandler.handle(userRequest);
-                Outputer.println("Запрос успешно обработан.");
+                // Outputer.println("Запрос успешно обработан.");
                 App.logger.info("Запрос успешно обработан.");
                 clientWriter.writeObject(responseToUser);
                 clientWriter.flush();
-                Outputer.println("Отправлен ответ клиенту.");
-                App.logger.info("Отправлен ответ клиенту.");
             }
         } catch (ClassNotFoundException exception) {
             Outputer.printerror("Произошла ошибка при чтении полученных данных!");

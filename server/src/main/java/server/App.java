@@ -2,8 +2,10 @@ package server;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import server.commands.*;
 import server.utility.CollectionFileManager;
 import server.utility.CollectionManager;
+import server.utility.CommandManager;
 import server.utility.RequestHandler;
 
 public class App {
@@ -15,7 +17,25 @@ public class App {
     public static void main(String[] args) {
         CollectionFileManager collectionFileManager = new CollectionFileManager(ENV_VARIABLE);
         CollectionManager collectionManager = new CollectionManager(collectionFileManager);
-        RequestHandler requestHandler = new RequestHandler(collectionManager);
+        CommandManager commandManager = new CommandManager(
+                new HelpCommand(),
+                new InfoCommand(collectionManager),
+                new ShowCommand(collectionManager),
+                new AddCommand(collectionManager),
+                new UpdateCommand(collectionManager),
+                new RemoveByIdCommand(collectionManager),
+                new ClearCommand(collectionManager),
+                new SaveCommand(collectionManager),
+                new ExitCommand(),
+                new ExecuteScriptCommand(),
+                new AddIfMinCommand(collectionManager),
+                new RemoveGreaterCommand(collectionManager),
+                new HistoryCommand(),
+                new SumOfHealthCommand(collectionManager),
+                new MaxByMeleeWeaponCommand(collectionManager),
+                new FilterByWeaponTypeCommand(collectionManager)
+        );
+        RequestHandler requestHandler = new RequestHandler(commandManager);
         Server server = new Server(PORT, CONNECTION_TIMEOUT, requestHandler);
         server.run();
     }
