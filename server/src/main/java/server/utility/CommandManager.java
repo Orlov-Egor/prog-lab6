@@ -6,6 +6,8 @@ import server.commands.Command;
 import java.util.ArrayList;
 import java.util.List;
 
+// TODO: Сделать рабочей историю
+
 /**
  * Operates the commands.
  */

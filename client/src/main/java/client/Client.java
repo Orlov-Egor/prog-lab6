@@ -90,7 +90,7 @@ public class Client {
                     // TODO: Подумать и подделать
                     case OK:
                     case ERROR:
-                        Outputer.println(serverResponse.getResponseBody());
+                        Outputer.print(serverResponse.getResponseBody());
                         break;
                     case EXIT:
                         System.exit(0);

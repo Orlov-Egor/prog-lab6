@@ -102,7 +102,7 @@ public class CollectionManager {
         MeleeWeapon maxMeleeWeapon = marinesCollection.stream().map(marine -> marine.getMeleeWeapon())
             .max(Enum::compareTo).get();
         return marinesCollection.stream()
-            .filter(marine -> marine.getMeleeWeapon().equals(maxMeleeWeapon)).findFirst().toString();
+            .filter(marine -> marine.getMeleeWeapon().equals(maxMeleeWeapon)).findFirst().get().toString();
     }
 
     /**
