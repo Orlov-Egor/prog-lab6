@@ -4,7 +4,6 @@ import common.interaction.Request;
 import common.interaction.Response;
 import common.interaction.ResponseCode;
 
-// TODO: Чуть-чуть круче обработать exit
 // TODO: Сделать обработку update
 
 public class RequestHandler {
@@ -83,6 +82,8 @@ public class RequestHandler {
             case "filter_by_weapon_type":
                 if (!commandManager.filterByWeaponType(commandStringArgument, commandObjectArgument))
                     return ResponseCode.ERROR;
+                break;
+            case "ping":
                 break;
             default:
                 throw new RuntimeException("Easter egg :)");

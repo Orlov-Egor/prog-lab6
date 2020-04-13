@@ -1,14 +1,6 @@
 package server.commands;
 
-import common.data.*;
-import common.exceptions.CollectionIsEmptyException;
-import common.exceptions.IncorrectInputInScriptException;
-import common.exceptions.MarineNotFoundException;
-import common.exceptions.WrongAmountOfElementsException;
 import server.utility.CollectionManager;
-import server.utility.ResponseOutputer;
-
-import java.time.LocalDateTime;
 
 /**
  * Command 'update'. Updates the information about selected marine.

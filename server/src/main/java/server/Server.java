@@ -66,12 +66,12 @@ public class Server {
 
     private void openServerSocket() throws OpeningServerSocketException {
         try {
-            Outputer.println("Запуск серверной части...");
-            App.logger.info("Запуск серверной части...");
+            Outputer.println("Запуск сервера...");
+            App.logger.info("Запуск сервера...");
             serverSocket = new ServerSocket(port);
             serverSocket.setSoTimeout(soTimeout);
-            Outputer.println("Серверная часть успешно запущен.");
-            App.logger.info("Серверная часть успешно запущен.");
+            Outputer.println("Сервер успешно запущен.");
+            App.logger.info("Сервер успешно запущен.");
         } catch (IllegalArgumentException exception) {
             Outputer.printerror("Порт " + port + " находится за пределами возможных значений!");
             App.logger.fatal("Порт " + port + " находится за пределами возможных значений!");
@@ -111,7 +111,7 @@ public class Server {
                 userRequest = (Request) clientReader.readObject();
                 responseToUser = requestHandler.handle(userRequest);
                 // Outputer.println("Запрос успешно обработан.");
-                App.logger.info("Запрос успешно обработан.");
+                App.logger.info("Запрос '" + userRequest.getCommandName() + "' успешно обработан.");
                 clientWriter.writeObject(responseToUser);
                 clientWriter.flush();
             }

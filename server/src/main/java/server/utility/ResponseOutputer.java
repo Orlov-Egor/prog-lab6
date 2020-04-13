@@ -16,7 +16,7 @@ public class ResponseOutputer {
     }
 
     public static void appenderror(Object toOut) {
-        stringBuilder.append("error: \" + toOut");
+        stringBuilder.append("error: " + toOut + "\n");
     }
     public static void appendtable(Object element1, Object element2) {
         stringBuilder.append(String.format("%-37s%-1s%n", element1, element2));

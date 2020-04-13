@@ -16,8 +16,6 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.TreeSet;
 
-// TODO: Настроить выводы в консоль
-
 /**
  * Operates the file for saving/loading collection.
  */
@@ -37,11 +35,11 @@ public class CollectionFileManager {
         if (System.getenv().get(envVariable) != null) {
             try (FileWriter collectionFileWriter = new FileWriter(new File(System.getenv().get(envVariable)))) {
                 collectionFileWriter.write(gson.toJson(collection));
-                Outputer.println("Коллекция успешна сохранена в файл!");
+                ResponseOutputer.appendln("Коллекция успешна сохранена в файл.");
             } catch (IOException exception) {
-                Outputer.printerror("Загрузочный файл является директорией/не может быть открыт!");
+                ResponseOutputer.appenderror("Загрузочный файл является директорией/не может быть открыт!");
             }
-        } else Outputer.printerror("Системная переменная с загрузочным файлом не найдена!");
+        } else ResponseOutputer.appenderror("Системная переменная с загрузочным файлом не найдена!");
     }
 
     /**
@@ -54,7 +52,7 @@ public class CollectionFileManager {
                 TreeSet<SpaceMarine> collection;
                 Type collectionType = new TypeToken<TreeSet<SpaceMarine>>() {}.getType();
                 collection = gson.fromJson(collectionFileScanner.nextLine().trim(), collectionType);
-                Outputer.println("Коллекция успешна загружена!");
+                Outputer.println("Коллекция успешна загружена.");
                 return collection;
             } catch (FileNotFoundException exception) {
                 Outputer.printerror("Загрузочный файл не найден!");

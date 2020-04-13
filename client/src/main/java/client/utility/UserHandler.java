@@ -14,6 +14,7 @@ import java.util.Scanner;
 
 public class UserHandler {
     private final int maxRewriteAttempts = 1;
+    private final String pingCommandName = "ping";
 
     private Scanner userScanner;
     private MarineAsker marineAsker;
@@ -64,6 +65,10 @@ public class UserHandler {
             // TODO: Для чего-то все-таки был нужен этот эксепшн...
         }  catch (IncorrectInputInScriptException exception) {}
         return new Request(userCommand[0], userCommand[1]);
+    }
+
+    public Request handlePing() {
+        return new Request(pingCommandName, "");
     }
 
     private ProcessingCode processCommand(String command, String commandArgument) {

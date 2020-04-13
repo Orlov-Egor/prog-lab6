@@ -6,8 +6,6 @@ import server.commands.Command;
 import java.util.ArrayList;
 import java.util.List;
 
-// TODO: Сделать рабочей историю
-
 /**
  * Operates the commands.
  */
@@ -111,7 +109,7 @@ public class CommandManager {
     public boolean help(String stringArgument, Object objectArgument) {
         if (helpCommand.execute(stringArgument, objectArgument)) {
             for (Command command : commands) {
-                ResponseOutputer.appendtable(command.getName(), command.getDescription());
+                ResponseOutputer.appendtable(command.getName() + " " + command.getUsage(), command.getDescription());
             }
             return true;
         } else return false;

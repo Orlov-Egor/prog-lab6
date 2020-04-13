@@ -4,7 +4,6 @@ import client.utility.UserHandler;
 import common.exceptions.ConnectionErrorException;
 import common.interaction.Request;
 import common.interaction.Response;
-import common.interaction.ResponseCode;
 import common.utility.Outputer;
 
 import java.io.*;
@@ -82,8 +81,12 @@ public class Client {
              ObjectInputStream serverReader = new ObjectInputStream(socketChannel.socket().getInputStream())) {
             Request requestToServer;
             Response serverResponse;
+            boolean pinged = false;
             while (true) {
-                requestToServer = userHandler.handle();
+                if (!pinged) {
+                    requestToServer = userHandler.handlePing();
+                    pinged = true;
+                } else requestToServer = userHandler.handle();
                 serverWriter.writeObject(requestToServer);
                 serverResponse = (Response) serverReader.readObject();
                 switch (serverResponse.getResponseCode()) {

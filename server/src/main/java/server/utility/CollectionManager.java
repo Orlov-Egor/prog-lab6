@@ -7,13 +7,12 @@ import common.exceptions.CollectionIsEmptyException;
 
 import java.time.LocalDateTime;
 import java.util.NavigableSet;
-import java.util.TreeSet;
 
 /**
  * Operates the collection itself.
  */
 public class CollectionManager {
-    private NavigableSet<SpaceMarine> marinesCollection =  new TreeSet<>();
+    private NavigableSet<SpaceMarine> marinesCollection;
     private LocalDateTime lastInitTime;
     private LocalDateTime lastSaveTime;
     private CollectionFileManager collectionFileManager;
