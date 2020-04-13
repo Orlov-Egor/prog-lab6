@@ -81,12 +81,8 @@ public class Client {
              ObjectInputStream serverReader = new ObjectInputStream(socketChannel.socket().getInputStream())) {
             Request requestToServer;
             Response serverResponse;
-            boolean pinged = false;
             while (true) {
-                if (!pinged) {
-                    requestToServer = userHandler.handlePing();
-                    pinged = true;
-                } else requestToServer = userHandler.handle();
+                requestToServer = userHandler.handle();
                 serverWriter.writeObject(requestToServer);
                 serverResponse = (Response) serverReader.readObject();
                 switch (serverResponse.getResponseCode()) {

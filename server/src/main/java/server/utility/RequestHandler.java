@@ -83,8 +83,6 @@ public class RequestHandler {
                 if (!commandManager.filterByWeaponType(commandStringArgument, commandObjectArgument))
                     return ResponseCode.ERROR;
                 break;
-            case "ping":
-                break;
             default:
                 throw new RuntimeException("Easter egg :)");
         }

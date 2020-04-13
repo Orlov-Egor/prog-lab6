@@ -67,10 +67,6 @@ public class UserHandler {
         return new Request(userCommand[0], userCommand[1]);
     }
 
-    public Request handlePing() {
-        return new Request(pingCommandName, "");
-    }
-
     private ProcessingCode processCommand(String command, String commandArgument) {
         try {
             switch (command) {
