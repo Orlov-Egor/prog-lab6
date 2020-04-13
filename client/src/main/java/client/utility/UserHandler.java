@@ -1,6 +1,7 @@
 package client.utility;
 
 import client.App;
+import common.data.*;
 import common.exceptions.CommandUsageException;
 import common.exceptions.IncorrectInputInScriptException;
 import common.interaction.MarineRaw;
@@ -14,7 +15,6 @@ import java.util.Scanner;
 
 public class UserHandler {
     private final int maxRewriteAttempts = 1;
-    private final String pingCommandName = "ping";
 
     private Scanner userScanner;
     private MarineAsker marineAsker;
@@ -48,7 +48,7 @@ public class UserHandler {
         try {
             switch (processingCode) {
                 case OBJECT:
-                    MarineRaw marineRaw = new MarineRaw(
+                    MarineRaw marineAddRaw = new MarineRaw(
                             marineAsker.askName(),
                             marineAsker.askCoordinates(),
                             marineAsker.askHealth(),
@@ -57,7 +57,32 @@ public class UserHandler {
                             marineAsker.askMeleeWeapon(),
                             marineAsker.askChapter()
                     );
-                    return new Request(userCommand[0], userCommand[1], marineRaw);
+                    return new Request(userCommand[0], userCommand[1], marineAddRaw);
+                case UPDATE_OBJECT:
+                    String name = marineAsker.askQuestion("Хотите изменить имя солдата?") ?
+                            marineAsker.askName() : null;
+                    Coordinates coordinates = marineAsker.askQuestion("Хотите изменить координаты солдата?") ?
+                            marineAsker.askCoordinates() : null;
+                    double health = marineAsker.askQuestion("Хотите изменить здоровье солдата?") ?
+                            marineAsker.askHealth() : -1;
+                    AstartesCategory category = marineAsker.askQuestion("Хотите изменить категорию солдата?") ?
+                            marineAsker.askCategory() : null;
+                    Weapon weaponType = marineAsker.askQuestion("Хотите изменить оружие дальнего боя солдата?") ?
+                            marineAsker.askWeaponType() : null;
+                    MeleeWeapon meleeWeapon = marineAsker.askQuestion("Хотите изменить оружие ближнего боя солдата?") ?
+                            marineAsker.askMeleeWeapon() : null;
+                    Chapter chapter = marineAsker.askQuestion("Хотите изменить орден солдата?") ?
+                            marineAsker.askChapter() : null;
+                    MarineRaw marineUpdateRaw = new MarineRaw(
+                            name,
+                            coordinates,
+                            health,
+                            category,
+                            weaponType,
+                            meleeWeapon,
+                            chapter
+                    );
+                    return new Request(userCommand[0], userCommand[1], marineUpdateRaw);
                 case SCRIPT:
                     Outputer.printerror("Как же я устал, зачем все вот это, сколько можно....");
                     break;
@@ -86,7 +111,7 @@ public class UserHandler {
                     return ProcessingCode.OBJECT;
                 case "update":
                     if (commandArgument.isEmpty()) throw new CommandUsageException("<ID> {element}");
-                    return ProcessingCode.OBJECT;
+                    return ProcessingCode.UPDATE_OBJECT;
                 case "remove_by_id":
                     if (commandArgument.isEmpty()) throw new CommandUsageException("<ID>");
                     break;

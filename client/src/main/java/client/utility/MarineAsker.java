@@ -172,7 +172,7 @@ public class MarineAsker {
                 strHealth = userScanner.nextLine().trim();
                 if (fileMode) Outputer.println(strHealth);
                 health = Double.parseDouble(strHealth);
-                if (health < SpaceMarine.MIN_HEALTH) throw new NotInDeclaredLimitsException();
+                if (health <= SpaceMarine.MIN_HEALTH) throw new NotInDeclaredLimitsException();
                 break;
             } catch (NoSuchElementException exception) {
                 Outputer.printerror("Здоровье не распознано!");
