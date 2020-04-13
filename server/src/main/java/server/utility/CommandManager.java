@@ -54,7 +54,7 @@ public class CommandManager {
         this.maxByMeleeWeaponCommand = maxByMeleeWeaponCommand;
         this.filterByWeaponTypeCommand = filterByWeaponTypeCommand;
 
-        // commands.add(helpCommand);
+        commands.add(helpCommand);
         commands.add(infoCommand);
         commands.add(showCommand);
         commands.add(addCommand);
@@ -93,7 +93,7 @@ public class CommandManager {
     public void addToHistory(String commandToStore) {
 
         for (Command command : commands) {
-            if (command.getName().split(" ")[0].equals(commandToStore)) {
+            if (command.getName().equals(commandToStore)) {
                 for (int i = COMMAND_HISTORY_SIZE-1; i>0; i--) {
                     commandHistory[i] = commandHistory[i-1];
                 }

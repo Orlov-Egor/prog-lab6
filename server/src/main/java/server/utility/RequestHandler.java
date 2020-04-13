@@ -17,6 +17,7 @@ public class RequestHandler {
     public Response handle(Request request) {
         ResponseCode responseCode = executeCommand(request.getCommandName(), request.getCommandStringArgument(),
                 request.getCommandObjectArgument());
+        commandManager.addToHistory(request.getCommandName());
         return new Response(responseCode, ResponseOutputer.getAndClear());
     }
 
