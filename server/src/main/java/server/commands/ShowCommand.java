@@ -23,7 +23,7 @@ public class ShowCommand extends AbstractCommand {
     public boolean execute(String stringArgument, Object objectArgument) {
         try {
             if (!stringArgument.isEmpty() || objectArgument != null) throw new WrongAmountOfElementsException();
-            ResponseOutputer.appendln(collectionManager);
+            ResponseOutputer.appendln(collectionManager.showCollection());
             return true;
         } catch (WrongAmountOfElementsException exception) {
             ResponseOutputer.appendln("Использование: '" + getName() + " " + getUsage() + "'");

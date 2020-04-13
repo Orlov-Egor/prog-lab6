@@ -3,8 +3,7 @@ package server.utility;
 import common.interaction.Request;
 import common.interaction.Response;
 import common.interaction.ResponseCode;
-
-// TODO: Сделать обработку update
+import common.utility.Outputer;
 
 public class RequestHandler {
     private CommandManager commandManager;
@@ -84,7 +83,8 @@ public class RequestHandler {
                     return ResponseCode.ERROR;
                 break;
             default:
-                throw new RuntimeException("Easter egg :)");
+                ResponseOutputer.appendln("Команда '" + command + "' не найдена. Наберите 'help' для справки.");
+                return ResponseCode.ERROR;
         }
         return ResponseCode.OK;
     }

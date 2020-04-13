@@ -63,8 +63,8 @@ public class CollectionFileManager {
                 Outputer.printerror("Загрузочный файл пуст!");
                 App.logger.error("Загрузочный файл пуст!");
             } catch (JsonParseException | NullPointerException exception) {
-                Outputer.printerror("В загрузочном файле не обнаружена необходимая коллекция!");
-                App.logger.error("В загрузочном файле не обнаружена необходимая коллекция!");
+                Outputer.printerror("В загрузочном файле не обнаружена корректная коллекция!");
+                App.logger.error("В загрузочном файле не обнаружена корректная коллекция!");
             } catch (IllegalStateException exception) {
                 Outputer.printerror("Непредвиденная ошибка!");
                 App.logger.fatal("Непредвиденная ошибка!");

@@ -390,9 +390,4 @@ public class MarineAsker {
         }
         return answer.equals("+");
     }
-
-    @Override
-    public String toString() {
-        return "MarineAsker (вспомогательный класс для запросов пользователю)";
-    }
 }

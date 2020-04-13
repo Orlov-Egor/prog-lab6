@@ -11,7 +11,7 @@ import common.utility.Outputer;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
-// TODO: Выполнение скрипта
+// TODO: Сделать возможным выполнение скрипта
 
 public class UserHandler {
     private final int maxRewriteAttempts = 1;

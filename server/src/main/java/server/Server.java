@@ -108,9 +108,10 @@ public class Server {
             Request userRequest;
             Response responseToUser;
             while (true) {
+                // TODO: Выключение сервера со специальной команды?
                 userRequest = (Request) clientReader.readObject();
                 responseToUser = requestHandler.handle(userRequest);
-                // Outputer.println("Запрос успешно обработан.");
+                // Outputer.println("Запрос '" + userRequest.getCommandName() + "' успешно обработан.");
                 App.logger.info("Запрос '" + userRequest.getCommandName() + "' успешно обработан.");
                 clientWriter.writeObject(responseToUser);
                 clientWriter.flush();

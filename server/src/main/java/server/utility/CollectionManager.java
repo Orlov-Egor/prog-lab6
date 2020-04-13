@@ -24,13 +24,6 @@ public class CollectionManager {
         
         loadCollection();
     }
-    
-    /**
-     * @return The collecton itself.
-     */
-    public NavigableSet<SpaceMarine> getCollection() {
-        return marinesCollection;
-    }
 
     /**
      * @return Last initialization time or null if there wasn't initialization.
@@ -89,6 +82,14 @@ public class CollectionManager {
     public double getSumOfHealth() {
         return marinesCollection.stream()
                 .reduce(0.0, (sum,p) -> sum+=p.getHealth(), Double::sum);
+    }
+
+    /**
+     * @return Collection content or corresponding string if collection is empty.
+     */
+    public String showCollection() {
+        if (marinesCollection.isEmpty()) return "Коллекция пуста!";
+        return marinesCollection.stream().reduce("", (sum,m) -> sum+= m +"\n\n", (sum1,sum2) ->  sum1+sum2).trim();
     }
 
     /**
@@ -167,11 +168,5 @@ public class CollectionManager {
     private void loadCollection() {
         marinesCollection = collectionFileManager.readCollection();
         lastInitTime = LocalDateTime.now();
-    }
-
-    @Override
-    public String toString() {
-        if (marinesCollection.isEmpty()) return "Коллекция пуста!";
-        return marinesCollection.stream().reduce("", (sum,m) -> sum+= m +"\n\n", (sum1,sum2) ->  sum1+sum2).trim();
     }
 }

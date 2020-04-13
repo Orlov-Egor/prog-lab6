@@ -4,6 +4,7 @@ import client.utility.UserHandler;
 import common.exceptions.ConnectionErrorException;
 import common.interaction.Request;
 import common.interaction.Response;
+import common.interaction.ResponseCode;
 import common.utility.Outputer;
 
 import java.io.*;
@@ -33,9 +34,10 @@ public class Client {
     public void run() {
         Outputer.println("Запуск клиента...");
         Outputer.println("Клиент успешно запущен.");
-        while (true) {
+        boolean processingStatus = true;
+        while (processingStatus) {
             try (SocketChannel socketChannel = connectToServer()) {
-                processRequestToServer(socketChannel);
+                processingStatus = processRequestToServer(socketChannel);
             } catch (ConnectionErrorException exception) {
                 reconnectionAttempts++;
                 if (reconnectionAttempts >= maxReconnectionAttempts) {
@@ -76,25 +78,19 @@ public class Client {
         }
     }
 
-    private void processRequestToServer(SocketChannel socketChannel) {
+    private boolean processRequestToServer(SocketChannel socketChannel) {
         try (ObjectOutputStream serverWriter = new ObjectOutputStream(socketChannel.socket().getOutputStream());
              ObjectInputStream serverReader = new ObjectInputStream(socketChannel.socket().getInputStream())) {
             Request requestToServer;
             Response serverResponse;
-            while (true) {
+            do {
                 requestToServer = userHandler.handle();
                 serverWriter.writeObject(requestToServer);
                 serverResponse = (Response) serverReader.readObject();
-                switch (serverResponse.getResponseCode()) {
-                    // TODO: Подумать и подделать
-                    case OK:
-                    case ERROR:
-                        Outputer.print(serverResponse.getResponseBody());
-                        break;
-                    case EXIT:
-                        System.exit(0);
-                }
-            }
+                // TODO: Зачем-то мне все-таки нужен был статус ERROR
+                Outputer.print(serverResponse.getResponseBody());
+            } while (serverResponse.getResponseCode() != ResponseCode.EXIT);
+            return false;
         } catch (InvalidClassException | NotSerializableException exception) {
             Outputer.printerror("Произошла ошибка при отправке данных на сервер!");
         } catch (ClassNotFoundException exception) {
@@ -102,6 +98,7 @@ public class Client {
         } catch (IOException exception) {
             Outputer.printerror("Непредвиденный разрыв соединения с сервером!");
         }
+        return true;
     }
 
 //    private void sendRequest(SocketChannel socketChannel, Serializable object) {

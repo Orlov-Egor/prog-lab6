@@ -71,13 +71,6 @@ public class CommandManager {
     }
 
     /**
-     * @return The command history.
-     */
-    public String[] getCommandHistory() {
-        return commandHistory;
-    }
-
-    /**
      * @return List of manager's commands.
      */
     public List<Command> getCommands() {
