@@ -1,5 +1,8 @@
 package client.utility;
 
+/**
+ * Enum of all code statuses.
+ */
 public enum ProcessingCode {
     OK,
     ERROR,

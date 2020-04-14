@@ -13,6 +13,9 @@ import java.util.Scanner;
 
 // TODO: Сделать возможным выполнение скрипта
 
+/**
+ * Receives user requests.
+ */
 public class UserHandler {
     private final int maxRewriteAttempts = 1;
 
@@ -24,6 +27,9 @@ public class UserHandler {
         this.marineAsker = marineAsker;
     }
 
+    /**
+    * Receives user input.
+    */
     public Request handle() {
         String[] userCommand;
         ProcessingCode processingCode;
@@ -92,6 +98,10 @@ public class UserHandler {
         return new Request(userCommand[0], userCommand[1]);
     }
 
+    /**
+    * Processes the entered command.
+    * @return Status of code.
+    */
     private ProcessingCode processCommand(String command, String commandArgument) {
         try {
             switch (command) {

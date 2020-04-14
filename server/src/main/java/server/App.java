@@ -8,6 +8,10 @@ import server.utility.CollectionManager;
 import server.utility.CommandManager;
 import server.utility.RequestHandler;
 
+/**
+ * Main server class. Creates all server instances.
+ * @author Sviridov Dmitry and Orlov Egor.
+ */
 public class App {
     public static final int PORT = 1821;
     public static final int CONNECTION_TIMEOUT = 60*1000;

@@ -12,7 +12,9 @@ import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
 
 // TODO: После того, как всё доделаю, разобраться с Object методами во всем проекте
-
+/**
+ * Runs the client.
+ */
 public class Client {
     private final int reconnectionTimeout;
     private final int maxReconnectionAttempts;
@@ -31,6 +33,9 @@ public class Client {
         this.userHandler = userHandler;
     }
 
+    /**
+    * Begins client operation.
+    */
     public void run() {
         Outputer.println("Запуск клиента...");
         Outputer.println("Клиент успешно запущен.");
@@ -60,6 +65,9 @@ public class Client {
         Outputer.println("Работа клиента успешно завершена.");
     }
 
+    /**
+    * Connecting to server.
+    */
     private SocketChannel connectToServer() throws ConnectionErrorException {
         try {
             if (reconnectionAttempts == 0) Outputer.println("Соединение с сервером...");
@@ -78,6 +86,9 @@ public class Client {
         }
     }
 
+    /**
+    * Server request process.
+    */
     private boolean processRequestToServer(SocketChannel socketChannel) {
         try (ObjectOutputStream serverWriter = new ObjectOutputStream(socketChannel.socket().getOutputStream());
              ObjectInputStream serverReader = new ObjectInputStream(socketChannel.socket().getInputStream())) {

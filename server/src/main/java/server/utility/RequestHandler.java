@@ -5,6 +5,9 @@ import common.interaction.Response;
 import common.interaction.ResponseCode;
 import common.utility.Outputer;
 
+/**
+ * Handles requests.
+ */
 public class RequestHandler {
     private CommandManager commandManager;
 
@@ -12,6 +15,11 @@ public class RequestHandler {
         this.commandManager = commandManager;
     }
 
+    /**
+    * Handles requests.
+    * @param request Request to be processed.
+    * @return Response to request.
+    */
     public Response handle(Request request) {
         ResponseCode responseCode = executeCommand(request.getCommandName(), request.getCommandStringArgument(),
                 request.getCommandObjectArgument());
@@ -19,6 +27,13 @@ public class RequestHandler {
         return new Response(responseCode, ResponseOutputer.getAndClear());
     }
 
+    /**
+    * Executes a command from a request.
+    * @param command Name of command.
+    * @param commandStringArgument String argument for command.
+    * @param commandObjectArgument Object argument for command.
+    * @return Command execute status.
+    */
     private ResponseCode executeCommand(String command, String commandStringArgument,
                                         Object commandObjectArgument) {
         switch (command) {
