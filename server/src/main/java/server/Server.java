@@ -13,6 +13,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 
+/**
+ * Runs the server.
+ */
 public class Server {
     private final int soTimeout;
 
@@ -26,6 +29,9 @@ public class Server {
         this.requestHandler = requestHandler;
     }
 
+    /**
+    * Begins server operation.
+    */
     public void run() {
         try {
             openServerSocket();
@@ -49,6 +55,9 @@ public class Server {
         }
     }
 
+    /**
+    * Finishes server operation.
+    */
     private void stop() {
         try {
             if (serverSocket == null) throw new ClosingSocketException();
@@ -64,6 +73,9 @@ public class Server {
         }
     }
 
+    /**
+    * Open server socket.
+    */
     private void openServerSocket() throws OpeningServerSocketException {
         try {
             Outputer.println("Запуск сервера...");
@@ -83,6 +95,9 @@ public class Server {
         }
     }
 
+    /**
+    * Connecting to client.
+    */
     private Socket connectToClient() throws ConnectionErrorException, SocketTimeoutException {
         try {
             Outputer.println("Прослушивание порта " + port + "...");
@@ -102,6 +117,9 @@ public class Server {
         }
     }
 
+    /**
+    * The process of receiving a request from a client.
+    */
     private void processClientRequest(Socket clientSocket) {
         try (ObjectInputStream clientReader = new ObjectInputStream(clientSocket.getInputStream());
              ObjectOutputStream clientWriter = new ObjectOutputStream(clientSocket.getOutputStream())) {

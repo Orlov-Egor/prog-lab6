@@ -5,6 +5,9 @@ import client.utility.UserHandler;
 
 import java.util.Scanner;
 
+/**
+ * Main server class. Creates all client instances.
+ */
 public class App {
     public static final String PS1 = "$ ";
     public static final String PS2 = "> ";
