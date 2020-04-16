@@ -3,7 +3,6 @@ package server.utility;
 import common.interaction.Request;
 import common.interaction.Response;
 import common.interaction.ResponseCode;
-import common.utility.Outputer;
 
 /**
  * Handles requests.
@@ -21,9 +20,9 @@ public class RequestHandler {
     * @return Response to request.
     */
     public Response handle(Request request) {
+        commandManager.addToHistory(request.getCommandName());
         ResponseCode responseCode = executeCommand(request.getCommandName(), request.getCommandStringArgument(),
                 request.getCommandObjectArgument());
-        commandManager.addToHistory(request.getCommandName());
         return new Response(responseCode, ResponseOutputer.getAndClear());
     }
 
@@ -98,7 +97,7 @@ public class RequestHandler {
                     return ResponseCode.ERROR;
                 break;
             default:
-                ResponseOutputer.appendln("Команда '" + command + "' не найдена. Наберите 'help' для справки.");
+                ResponseOutputer.appendln("Команда '" + command + "' не найдена на сервере. Наберите 'help' для справки.");
                 return ResponseCode.ERROR;
         }
         return ResponseCode.OK;

@@ -156,7 +156,7 @@ public class UserHandler {
                     if (commandArgument.isEmpty()) throw new CommandUsageException("<weapon_type>");
                     break;
                 default:
-                    Outputer.println("Команда '" + command + "' не найдена. Наберите 'help' для справки.");
+                    Outputer.println("Команда '" + command + "' не найдена на клиенте. Наберите 'help' для справки.");
                     return ProcessingCode.ERROR;
             }
         } catch (CommandUsageException exception) {
