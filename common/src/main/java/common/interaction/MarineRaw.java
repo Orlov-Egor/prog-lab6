@@ -4,6 +4,9 @@ import common.data.*;
 
 import java.io.Serializable;
 
+/**
+ * Class for get Marines value.
+ */
 public class MarineRaw implements Serializable {
     private String name;
     private Coordinates coordinates;

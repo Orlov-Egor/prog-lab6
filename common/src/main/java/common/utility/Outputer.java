@@ -1,5 +1,8 @@
 package common.utility;
 
+/**
+ * Class for outputting something
+ */
 public class Outputer {
     /**
      * Prints toOut.toString() to Console

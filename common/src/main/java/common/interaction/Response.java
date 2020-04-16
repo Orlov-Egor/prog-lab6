@@ -2,6 +2,9 @@ package common.interaction;
 
 import java.io.Serializable;
 
+/**
+ * Class for get response value.
+ */
 public class Response implements Serializable {
     private ResponseCode responseCode;
     private String responseBody;
@@ -11,10 +14,16 @@ public class Response implements Serializable {
         this.responseBody = responseBody;
     }
 
+    /**
+     * @return Response сode.
+    */
     public ResponseCode getResponseCode() {
         return responseCode;
     }
 
+    /**
+     * @return Response body.
+    */
     public String getResponseBody() {
         return responseBody;
     }
