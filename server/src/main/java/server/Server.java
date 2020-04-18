@@ -118,8 +118,8 @@ public class Server {
     private void processClientRequest(Socket clientSocket) {
         try (ObjectInputStream clientReader = new ObjectInputStream(clientSocket.getInputStream());
              ObjectOutputStream clientWriter = new ObjectOutputStream(clientSocket.getOutputStream())) {
-            Request userRequest;
-            Response responseToUser;
+            Request userRequest = null;
+            Response responseToUser = null;
             while (true) {
                 // TODO: Выключение сервера со специальной команды?
                 userRequest = (Request) clientReader.readObject();

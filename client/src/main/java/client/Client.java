@@ -95,13 +95,13 @@ public class Client {
         try (ObjectOutputStream serverWriter = new ObjectOutputStream(socketChannel.socket().getOutputStream());
              ObjectInputStream serverReader = new ObjectInputStream(socketChannel.socket().getInputStream())) {
             Outputer.println("Разрешение на обмен данными получено.");
-            Request requestToServer;
-            Response serverResponse;
+            Request requestToServer = null;
+            Response serverResponse = null;
             do {
-                requestToServer = userHandler.handle();
+                requestToServer = serverResponse != null ? userHandler.handle(serverResponse.getResponseCode()) :
+                    userHandler.handle(null);
                 serverWriter.writeObject(requestToServer);
                 serverResponse = (Response) serverReader.readObject();
-                // TODO: Зачем-то мне все-таки нужен был статус ERROR
                 Outputer.print(serverResponse.getResponseBody());
             } while (serverResponse.getResponseCode() != ResponseCode.EXIT);
             return false;

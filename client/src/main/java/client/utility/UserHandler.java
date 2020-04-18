@@ -4,14 +4,17 @@ import client.App;
 import common.data.*;
 import common.exceptions.CommandUsageException;
 import common.exceptions.IncorrectInputInScriptException;
+import common.exceptions.ScriptRecursionException;
 import common.interaction.MarineRaw;
 import common.interaction.Request;
+import common.interaction.ResponseCode;
 import common.utility.Outputer;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
-
-// TODO: Сделать возможным выполнение скрипта
+import java.util.Stack;
 
 /**
  * Receives user requests.
@@ -20,81 +23,87 @@ public class UserHandler {
     private final int maxRewriteAttempts = 1;
 
     private Scanner userScanner;
-    private MarineAsker marineAsker;
+    private Stack<File> scriptStack = new Stack<>();
+    private Stack<Scanner> scannerStack = new Stack<>();
 
-    public UserHandler(Scanner userScanner, MarineAsker marineAsker) {
+    public UserHandler(Scanner userScanner) {
         this.userScanner = userScanner;
-        this.marineAsker = marineAsker;
     }
 
     /**
     * Receives user input.
     */
-    public Request handle() {
+    public Request handle(ResponseCode serverResponseCode) {
+        String userInput;
         String[] userCommand;
         ProcessingCode processingCode;
         int rewriteAttempts = 0;
-        do {
-            try {
-                Outputer.print(App.PS1);
-                userCommand = (userScanner.nextLine().trim() + " ").split(" ", 2);
-                userCommand[1] = userCommand[1].trim();
-            } catch (NoSuchElementException | IllegalStateException exception) {
-                Outputer.println();
-                Outputer.printerror("Произошла ошибка при пользовательском вводе!");
-                userCommand = new String[] {"", ""};
-                rewriteAttempts++;
-                if (rewriteAttempts >= maxRewriteAttempts) {
-                    Outputer.printerror("Превышено количество попыток пользовательского ввода!");
-                    System.exit(0);
-                }
-            }
-            processingCode = processCommand(userCommand[0], userCommand[1]);
-        } while (processingCode == ProcessingCode.ERROR);
         try {
-            switch (processingCode) {
-                case OBJECT:
-                    MarineRaw marineAddRaw = new MarineRaw(
-                            marineAsker.askName(),
-                            marineAsker.askCoordinates(),
-                            marineAsker.askHealth(),
-                            marineAsker.askCategory(),
-                            marineAsker.askWeaponType(),
-                            marineAsker.askMeleeWeapon(),
-                            marineAsker.askChapter()
-                    );
-                    return new Request(userCommand[0], userCommand[1], marineAddRaw);
-                case UPDATE_OBJECT:
-                    String name = marineAsker.askQuestion("Хотите изменить имя солдата?") ?
-                            marineAsker.askName() : null;
-                    Coordinates coordinates = marineAsker.askQuestion("Хотите изменить координаты солдата?") ?
-                            marineAsker.askCoordinates() : null;
-                    double health = marineAsker.askQuestion("Хотите изменить здоровье солдата?") ?
-                            marineAsker.askHealth() : -1;
-                    AstartesCategory category = marineAsker.askQuestion("Хотите изменить категорию солдата?") ?
-                            marineAsker.askCategory() : null;
-                    Weapon weaponType = marineAsker.askQuestion("Хотите изменить оружие дальнего боя солдата?") ?
-                            marineAsker.askWeaponType() : null;
-                    MeleeWeapon meleeWeapon = marineAsker.askQuestion("Хотите изменить оружие ближнего боя солдата?") ?
-                            marineAsker.askMeleeWeapon() : null;
-                    Chapter chapter = marineAsker.askQuestion("Хотите изменить орден солдата?") ?
-                            marineAsker.askChapter() : null;
-                    MarineRaw marineUpdateRaw = new MarineRaw(
-                            name,
-                            coordinates,
-                            health,
-                            category,
-                            weaponType,
-                            meleeWeapon,
-                            chapter
-                    );
-                    return new Request(userCommand[0], userCommand[1], marineUpdateRaw);
-                case SCRIPT:
-                    Outputer.printerror("Как же я устал, зачем все вот это, сколько можно....");
-                    break;
+            do {
+                try {
+                    if (fileMode() && serverResponseCode == ResponseCode.ERROR)
+                        throw new IncorrectInputInScriptException();
+                    while (fileMode() && !userScanner.hasNextLine()) {
+                        userScanner = scannerStack.pop();
+                        Outputer.println("Возвращаюсь к скрипту " + scriptStack.pop().getName() + "...");
+                    }
+                    if (fileMode()) {
+                        userInput = userScanner.nextLine();
+                        if (!userInput.isEmpty()) {
+                            Outputer.print(App.PS1);
+                            Outputer.println(userInput);
+                        }
+                    } else {
+                        Outputer.print(App.PS1);
+                        userInput = userScanner.nextLine();
+                    }
+                    userCommand = (userInput.trim() + " ").split(" ", 2);
+                    userCommand[1] = userCommand[1].trim();
+                } catch (NoSuchElementException | IllegalStateException exception) {
+                    Outputer.println();
+                    Outputer.printerror("Произошла ошибка при вводе команды!");
+                    userCommand = new String[]{"", ""};
+                    rewriteAttempts++;
+                    if (rewriteAttempts >= maxRewriteAttempts) {
+                        Outputer.printerror("Превышено количество попыток ввода!");
+                        System.exit(0);
+                    }
+                }
+                processingCode = processCommand(userCommand[0], userCommand[1]);
+            } while (processingCode == ProcessingCode.ERROR && !fileMode() || userCommand[0].isEmpty());
+            try {
+                if (fileMode() && (serverResponseCode == ResponseCode.ERROR || processingCode == ProcessingCode.ERROR))
+                    throw new IncorrectInputInScriptException();
+                switch (processingCode) {
+                    case OBJECT:
+                        MarineRaw marineAddRaw = generateMarineAdd();
+                        return new Request(userCommand[0], userCommand[1], marineAddRaw);
+                    case UPDATE_OBJECT:
+                        MarineRaw marineUpdateRaw = generateMarineUpdate();
+                        return new Request(userCommand[0], userCommand[1], marineUpdateRaw);
+                    case SCRIPT:
+                        File scriptFile = new File(userCommand[1]);
+                        if (!scriptFile.exists()) throw new FileNotFoundException();
+                        if (!scriptStack.isEmpty() && scriptStack.search(scriptFile) != -1)
+                            throw new ScriptRecursionException();
+                        scannerStack.push(userScanner);
+                        scriptStack.push(scriptFile);
+                        userScanner = new Scanner(scriptFile);
+                        Outputer.println("Выполняю скрипт " + scriptFile.getName() + "...");
+                        break;
+                }
+            } catch (FileNotFoundException exception) {
+                Outputer.printerror("Файл со скриптом не найден!");
+            } catch (ScriptRecursionException exception) {
+                Outputer.printerror("Скрипты не могут вызываться рекурсивно!");
+                throw new IncorrectInputInScriptException();
             }
-            // TODO: Для чего-то все-таки был нужен этот эксепшн...
-        }  catch (IncorrectInputInScriptException exception) {}
+        } catch (IncorrectInputInScriptException exception) {
+            Outputer.printerror("Выполнение скрипта прервано!");
+            while (!scannerStack.isEmpty()) userScanner = scannerStack.pop();
+            scriptStack.clear();
+            return new Request();
+        }
         return new Request(userCommand[0], userCommand[1]);
     }
 
@@ -156,7 +165,7 @@ public class UserHandler {
                     if (commandArgument.isEmpty()) throw new CommandUsageException("<weapon_type>");
                     break;
                 default:
-                    Outputer.println("Команда '" + command + "' не найдена на клиенте. Наберите 'help' для справки.");
+                    Outputer.println("Команда '" + command + "' не найдена. Наберите 'help' для справки.");
                     return ProcessingCode.ERROR;
             }
         } catch (CommandUsageException exception) {
@@ -165,5 +174,65 @@ public class UserHandler {
             return ProcessingCode.ERROR;
         }
         return ProcessingCode.OK;
+    }
+
+    /**
+     * Generates marine to add.
+     * @return Marine to add.
+     * @throws IncorrectInputInScriptException When something went wrong in script.
+     */
+    private MarineRaw generateMarineAdd() throws IncorrectInputInScriptException {
+        MarineAsker marineAsker = new MarineAsker(userScanner);
+        if (fileMode()) marineAsker.setFileMode();
+        return new MarineRaw(
+                    marineAsker.askName(),
+                    marineAsker.askCoordinates(),
+                    marineAsker.askHealth(),
+                    marineAsker.askCategory(),
+                    marineAsker.askWeaponType(),
+                    marineAsker.askMeleeWeapon(),
+                    marineAsker.askChapter()
+            );
+    }
+
+    /**
+     * Generates marine to update.
+     * @return Marine to update.
+     * @throws IncorrectInputInScriptException When something went wrong in script.
+     */
+    private MarineRaw generateMarineUpdate() throws IncorrectInputInScriptException {
+        MarineAsker marineAsker = new MarineAsker(userScanner);
+        if (fileMode()) marineAsker.setFileMode();
+        String name = marineAsker.askQuestion("Хотите изменить имя солдата?") ?
+                marineAsker.askName() : null;
+        Coordinates coordinates = marineAsker.askQuestion("Хотите изменить координаты солдата?") ?
+                marineAsker.askCoordinates() : null;
+        double health = marineAsker.askQuestion("Хотите изменить здоровье солдата?") ?
+                marineAsker.askHealth() : -1;
+        AstartesCategory category = marineAsker.askQuestion("Хотите изменить категорию солдата?") ?
+                marineAsker.askCategory() : null;
+        Weapon weaponType = marineAsker.askQuestion("Хотите изменить оружие дальнего боя солдата?") ?
+                marineAsker.askWeaponType() : null;
+        MeleeWeapon meleeWeapon = marineAsker.askQuestion("Хотите изменить оружие ближнего боя солдата?") ?
+                marineAsker.askMeleeWeapon() : null;
+        Chapter chapter = marineAsker.askQuestion("Хотите изменить орден солдата?") ?
+                marineAsker.askChapter() : null;
+        return new MarineRaw(
+                name,
+                coordinates,
+                health,
+                category,
+                weaponType,
+                meleeWeapon,
+                chapter
+        );
+    }
+
+    /**
+     * Checks if UserHandler is in file mode now.
+     * @return Is UserHandler in file mode now boolean.
+     */
+    private boolean fileMode() {
+        return !scannerStack.isEmpty();
     }
 }

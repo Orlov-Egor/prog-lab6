@@ -1,6 +1,5 @@
 package client;
 
-import client.utility.MarineAsker;
 import client.utility.UserHandler;
 
 import java.util.Scanner;
@@ -18,8 +17,7 @@ public class App {
 
     public static void main(String[] args) {
         Scanner userScanner = new Scanner(System.in);
-        MarineAsker marineAsker = new MarineAsker(userScanner);
-        UserHandler userHandler = new UserHandler(userScanner, marineAsker);
+        UserHandler userHandler = new UserHandler(userScanner);
         Client client = new Client(HOST, PORT, RECONNECTION_TIMEOUT, MAX_RECONNECTION_ATTEMPTS, userHandler);
         client.run();
         userScanner.close();

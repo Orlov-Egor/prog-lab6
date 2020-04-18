@@ -17,6 +17,10 @@ public class Request implements Serializable {
         this(commandName, commandStringArgument, null);
     }
 
+    public Request() {
+        this("", "");
+    }
+
     public String getCommandName() {
         return commandName;
     }

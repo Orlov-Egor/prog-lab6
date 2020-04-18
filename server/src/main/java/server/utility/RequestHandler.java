@@ -36,6 +36,8 @@ public class RequestHandler {
     private ResponseCode executeCommand(String command, String commandStringArgument,
                                         Object commandObjectArgument) {
         switch (command) {
+            case "":
+                break;
             case "help":
                 if (!commandManager.help(commandStringArgument, commandObjectArgument))
                     return ResponseCode.ERROR;
@@ -68,6 +70,8 @@ public class RequestHandler {
                 if (!commandManager.save(commandStringArgument, commandObjectArgument))
                     return ResponseCode.ERROR;
                 break;
+            case "execute_script":
+                break;
             case "exit":
                 if (!commandManager.exit(commandStringArgument, commandObjectArgument))
                     return ResponseCode.ERROR;
@@ -97,7 +101,7 @@ public class RequestHandler {
                     return ResponseCode.ERROR;
                 break;
             default:
-                ResponseOutputer.appendln("Команда '" + command + "' не найдена на сервере. Наберите 'help' для справки.");
+                ResponseOutputer.appendln("Команда '" + command + "' не найдена. Наберите 'help' для справки.");
                 return ResponseCode.ERROR;
         }
         return ResponseCode.OK;
