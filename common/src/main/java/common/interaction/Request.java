@@ -20,6 +20,10 @@ public class Request implements Serializable {
         this(commandName, commandStringArgument, null);
     }
 
+    public Request() {
+        this("", "");
+    }
+  
     /**
      * @return Command name.
     */

@@ -3,7 +3,6 @@ package server.utility;
 import common.interaction.Request;
 import common.interaction.Response;
 import common.interaction.ResponseCode;
-import common.utility.Outputer;
 
 /**
  * Handles requests.
@@ -21,9 +20,9 @@ public class RequestHandler {
     * @return Response to request.
     */
     public Response handle(Request request) {
+        commandManager.addToHistory(request.getCommandName());
         ResponseCode responseCode = executeCommand(request.getCommandName(), request.getCommandStringArgument(),
                 request.getCommandObjectArgument());
-        commandManager.addToHistory(request.getCommandName());
         return new Response(responseCode, ResponseOutputer.getAndClear());
     }
 
@@ -37,6 +36,8 @@ public class RequestHandler {
     private ResponseCode executeCommand(String command, String commandStringArgument,
                                         Object commandObjectArgument) {
         switch (command) {
+            case "":
+                break;
             case "help":
                 if (!commandManager.help(commandStringArgument, commandObjectArgument))
                     return ResponseCode.ERROR;
@@ -68,6 +69,8 @@ public class RequestHandler {
             case "save":
                 if (!commandManager.save(commandStringArgument, commandObjectArgument))
                     return ResponseCode.ERROR;
+                break;
+            case "execute_script":
                 break;
             case "exit":
                 if (!commandManager.exit(commandStringArgument, commandObjectArgument))

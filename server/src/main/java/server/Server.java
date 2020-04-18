@@ -17,9 +17,8 @@ import java.net.SocketTimeoutException;
  * Runs the server.
  */
 public class Server {
-    private final int soTimeout;
-
     private int port;
+    private int soTimeout;
     private ServerSocket serverSocket;
     private RequestHandler requestHandler;
 
@@ -38,10 +37,7 @@ public class Server {
             while (true) {
                 try (Socket clientSocket = connectToClient()) {
                     processClientRequest(clientSocket);
-                } catch (ConnectionErrorException exception) {
-                    Outputer.println("Повторное соединение с клиентом...");
-                    App.logger.info("Повторное соединение с клиентом...");
-                } catch (SocketTimeoutException exception) {
+                } catch (ConnectionErrorException | SocketTimeoutException exception) {
                     break;
                 } catch (IOException exception) {
                     Outputer.printerror("Произошла ошибка при попытке завершить соединение с клиентом!");
@@ -60,6 +56,7 @@ public class Server {
     */
     private void stop() {
         try {
+            App.logger.info("Завершение работы сервера...");
             if (serverSocket == null) throw new ClosingSocketException();
             serverSocket.close();
             Outputer.println("Работа сервера успешно завершена.");
@@ -78,19 +75,17 @@ public class Server {
     */
     private void openServerSocket() throws OpeningServerSocketException {
         try {
-            Outputer.println("Запуск сервера...");
             App.logger.info("Запуск сервера...");
             serverSocket = new ServerSocket(port);
             serverSocket.setSoTimeout(soTimeout);
-            Outputer.println("Сервер успешно запущен.");
             App.logger.info("Сервер успешно запущен.");
         } catch (IllegalArgumentException exception) {
-            Outputer.printerror("Порт " + port + " находится за пределами возможных значений!");
-            App.logger.fatal("Порт " + port + " находится за пределами возможных значений!");
+            Outputer.printerror("Порт '" + port + "' находится за пределами возможных значений!");
+            App.logger.fatal("Порт '" + port + "' находится за пределами возможных значений!");
             throw new OpeningServerSocketException();
         } catch (IOException exception) {
-            Outputer.printerror("Произошла ошибка при попытке использовать порт " + port + "!");
-            App.logger.fatal("Произошла ошибка при попытке использовать порт " + port + "!");
+            Outputer.printerror("Произошла ошибка при попытке использовать порт '" + port + "'!");
+            App.logger.fatal("Произошла ошибка при попытке использовать порт '" + port + "'!");
             throw new OpeningServerSocketException();
         }
     }
@@ -100,8 +95,8 @@ public class Server {
     */
     private Socket connectToClient() throws ConnectionErrorException, SocketTimeoutException {
         try {
-            Outputer.println("Прослушивание порта " + port + "...");
-            App.logger.info("Прослушивание порта " + port + "...");
+            Outputer.println("Прослушивание порта '" + port + "'...");
+            App.logger.info("Прослушивание порта '" + port + "'...");
             Socket clientSocket = serverSocket.accept();
             Outputer.println("Соединение с клиентом успешно установлено.");
             App.logger.info("Соединение с клиентом успешно установлено.");
@@ -123,13 +118,12 @@ public class Server {
     private void processClientRequest(Socket clientSocket) {
         try (ObjectInputStream clientReader = new ObjectInputStream(clientSocket.getInputStream());
              ObjectOutputStream clientWriter = new ObjectOutputStream(clientSocket.getOutputStream())) {
-            Request userRequest;
-            Response responseToUser;
+            Request userRequest = null;
+            Response responseToUser = null;
             while (true) {
                 // TODO: Выключение сервера со специальной команды?
                 userRequest = (Request) clientReader.readObject();
                 responseToUser = requestHandler.handle(userRequest);
-                // Outputer.println("Запрос '" + userRequest.getCommandName() + "' успешно обработан.");
                 App.logger.info("Запрос '" + userRequest.getCommandName() + "' успешно обработан.");
                 clientWriter.writeObject(responseToUser);
                 clientWriter.flush();
